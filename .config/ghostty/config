@@ -1,0 +1,5 @@
+font-size = 18
+cursor-style = block
+shell-integration-features = no-cursor
+theme = catppuccin-mocha
+window-decoration = false

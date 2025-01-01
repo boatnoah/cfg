@@ -1,0 +1,159 @@
+#######################
+# Basic Configuration #
+#######################
+
+# i3 config file (v4)
+set $mod Mod1
+font pango:JetBrainsMono Nerd Font 18
+
+###############
+# Autostart   #
+###############
+
+# System
+exec --no-startup-id dex --autostart --environment i3
+exec --no-startup-id nm-applet
+exec_always --no-startup-id setxkbmap -option ctrl:nocaps
+exec_always --no-startup-id xset r rate 200 50
+
+# Appearance and Compositor
+exec_always --no-startup-id feh --bg-scale ~/backgrounds/mountain.jpg
+exec_always --no-startup-id picom -b
+exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+
+# Lock Screen Setup
+exec --no-startup-id xss-lock --transfer-sleep-lock -- betterlockscreen -l dim --time-format "%I:%M %p"
+
+################
+# Key Bindings #
+################
+
+# System Controls
+bindsym $mod+shift+Escape exec betterlockscreen -l dim --time-format "%I:%M %p"
+bindsym $mod+Shift+c restart
+bindsym $mod+Shift+3 exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
+
+# Applications
+bindsym $mod+Return exec ghostty
+bindsym $mod+Tab exec --no-startup-id ~/.config/rofi/launchers/type-2/launcher.sh
+bindsym $mod+Shift+BackSpace exec --no-startup-id ~/.config/rofi/applets/bin/screenshot.sh
+bindsym $mod+Shift+d kill
+
+# Audio Controls
+set $refresh_i3status killall -SIGUSR1 i3status
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_i3status
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
+bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
+
+###################
+# Window Controls #
+###################
+
+# Focus
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# Movement
+bindsym $mod+Shift+j move left
+bindsym $mod+Shift+k move down
+bindsym $mod+Shift+l move up
+bindsym $mod+Shift+semicolon move right
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+# Layout
+bindsym $mod+s split h
+bindsym $mod+v split v
+bindsym $mod+f fullscreen toggle
+
+# Mouse
+floating_modifier $mod
+tiling_drag modifier titlebar
+
+##############
+# Workspaces #
+##############
+
+# Workspace Names
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6"
+set $ws7 "7"
+set $ws8 "8"
+set $ws9 "9"
+set $ws10 "10"
+
+# Switch to Workspace
+bindsym $mod+q workspace number $ws1
+bindsym $mod+w workspace number $ws2
+bindsym $mod+e workspace number $ws3
+bindsym $mod+r workspace number $ws4
+bindsym $mod+t workspace number $ws5
+bindsym $mod+y workspace number $ws6
+bindsym $mod+u workspace number $ws7
+bindsym $mod+i workspace number $ws8
+bindsym $mod+o workspace number $ws9
+bindsym $mod+p workspace number $ws10
+
+# Move to Workspace
+bindsym $mod+Shift+q move container to workspace number $ws1
+bindsym $mod+Shift+w move container to workspace number $ws2
+bindsym $mod+Shift+e move container to workspace number $ws3
+bindsym $mod+Shift+r move container to workspace number $ws4
+bindsym $mod+Shift+t move container to workspace number $ws5
+bindsym $mod+Shift+y move container to workspace number $ws6
+bindsym $mod+Shift+u move container to workspace number $ws7
+bindsym $mod+Shift+i move container to workspace number $ws8
+bindsym $mod+Shift+o move container to workspace number $ws9
+bindsym $mod+Shift+p move container to workspace number $ws10
+
+##################
+# Resize Mode    #
+##################
+
+mode "resize" {
+        bindsym h resize shrink width 10 px or 10 ppt
+        bindsym j resize grow height 10 px or 10 ppt
+        bindsym k resize shrink height 10 px or 10 ppt
+        bindsym l resize grow width 10 px or 10 ppt
+
+        bindsym Left resize shrink width 10 px or 10 ppt
+        bindsym Down resize grow height 10 px or 10 ppt
+        bindsym Up resize shrink height 10 px or 10 ppt
+        bindsym Right resize grow width 10 px or 10 ppt
+
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+        bindsym $mod+g mode "default"
+}
+bindsym $mod+g mode "resize"
+
+###################
+# Window Settings #
+###################
+
+# Gaps
+gaps inner 3
+gaps outer 1
+
+# Border Settings
+default_border none
+default_floating_border none
+for_window [class=".*"] border pixel 0
+
+# Dialog Windows
+for_window [window_role="GtkFileChooserDialog"] floating enable
+for_window [window_role="GtkFileChooserDialog"] resize set 800 600
+for_window [window_role="GtkFileChooserDialog"] move position center
