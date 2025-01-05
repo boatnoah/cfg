@@ -26,8 +26,8 @@ setopt hist_find_no_dups
 # Environment Variables
 #
 export EDITOR=nvim
-export PATH=~/.npm-global/bin:$PATH
-# export PATH=$HOME/.config/rofi/scripts:$PATH
+NPM_GLOBALS="${HOME}/.npm-globals"
+export PATH="$PATH:$NPM_GLOBALS/bin:$PATH"
 
 #
 # Completion Settings
@@ -65,7 +65,7 @@ alias nvconf='nvim ~/.config/nvim/init.lua'
 alias zshrc='nvim ~/.zshrc'
 alias c='clear'
 alias h='~'
-alias ff='fastfetch'
+alias nvim-dev='NVIM_APPNAME="nvim-dev" nvim'
 
 #
 # Theme Configuration (load last for better startup time)

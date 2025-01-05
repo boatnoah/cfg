@@ -17,7 +17,7 @@ exec_always --no-startup-id setxkbmap -option ctrl:nocaps
 exec_always --no-startup-id xset r rate 200 50
 
 # Appearance and Compositor
-exec_always --no-startup-id feh --bg-scale ~/backgrounds/mountain.jpg
+exec_always --no-startup-id feh --bg-scale ~/backgrounds/default.png
 exec_always --no-startup-id picom -b
 exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 
@@ -157,3 +157,7 @@ for_window [class=".*"] border pixel 0
 for_window [window_role="GtkFileChooserDialog"] floating enable
 for_window [window_role="GtkFileChooserDialog"] resize set 800 600
 for_window [window_role="GtkFileChooserDialog"] move position center
+
+
+
+
