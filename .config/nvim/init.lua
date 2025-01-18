@@ -140,28 +140,10 @@ vim.opt.rtp:prepend(lazypath)
 --  To update plugins you can run
 --    :Lazy update
 --
--- NOTE: Here is where you install your plugins.
 require('lazy').setup({
-  -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  -- 'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
-  -- NOTE: Plugins can also be added by using a table,
-  -- with the first argument being the link and the following
-  -- keys can be used to configure plugin behavior/loading/etc.
-  --
-  -- Use `opts = {}` to force a plugin to be loaded.
-  --
-  --  This is equivalent to:
-  --    require('Comment').setup({})
-
-  -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
 
-  -- Here is a more advanced example where we pass configuration
-  -- options to `gitsigns.nvim`. This is equivalent to the following Lua:
-  --    require('gitsigns').setup({ ... })
-  --
-  -- See `:help gitsigns` to understand what the configuration keys do
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
     opts = {
@@ -349,6 +331,7 @@ require('lazy').setup({
       -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
       -- used for completion, annotations and signatures of Neovim apis
       { 'folke/neodev.nvim', opts = {} },
+      { 'saghen/blink.cmp' },
     },
     config = function()
       -- Brief aside: **What is LSP?**
@@ -479,7 +462,7 @@ require('lazy').setup({
       --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
       --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+      capabilities = vim.tbl_deep_extend('force', capabilities, require('blink.cmp').get_lsp_capabilities())
 
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -494,12 +477,6 @@ require('lazy').setup({
       local servers = {
         clangd = {},
         gopls = {},
-        -- ... etc. see `:help lspconfig-all` for a list of all the pre-configured lsps
-        --
-        -- some languages (like typescript) have entire language plugins that can be useful:
-        --    https://github.com/pmizio/typescript-tools.nvim
-        --
-        -- but for many setups, the lsp (`tsserver`) will work just fine
         pyright = {},
         tailwindcss = {},
         jsonls = {},
@@ -549,9 +526,6 @@ require('lazy').setup({
         handlers = {
           function(server_name)
             local server = servers[server_name] or {}
-            -- this handles overriding only values explicitly passed
-            -- by the server configuration above. useful when disabling
-            -- certain features of an lsp (for example, turning off formatting for tsserver)
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
             require('lspconfig')[server_name].setup(server)
           end,
@@ -605,132 +579,26 @@ require('lazy').setup({
     },
   },
 
-  { -- autocompletion
-    'hrsh7th/nvim-cmp',
-    event = 'insertenter',
-    dependencies = {
-      -- snippet engine & its associated nvim-cmp source
-      {
-        'l3mon4d3/luasnip',
-        build = (function()
-          -- build step is needed for regex support in snippets.
-          -- this step is not supported in many windows environments.
-          -- remove the below condition to re-enable on windows.
-          if vim.fn.has 'win32' == 1 or vim.fn.executable 'make' == 0 then
-            return
-          end
-          return 'make install_jsregexp'
-        end)(),
-        dependencies = {
-          -- `friendly-snippets` contains a variety of premade snippets.
-          --    see the readme about individual language/framework/plugin snippets:
-          --    https://github.com/rafamadriz/friendly-snippets
-          {
-            'rafamadriz/friendly-snippets',
-            config = function()
-              require('luasnip.loaders.from_vscode').lazy_load()
-            end,
-          },
-        },
-      },
-      'saadparwaiz1/cmp_luasnip',
-
-      -- adds other completion capabilities.
-      --  nvim-cmp does not ship with all sources by default. they are split
-      --  into multiple repos for maintenance purposes.
-      'hrsh7th/cmp-nvim-lsp',
-      'hrsh7th/cmp-path',
-    },
-    config = function()
-      -- see `:help cmp`
-      local cmp = require 'cmp'
-      local luasnip = require 'luasnip'
-      luasnip.config.setup {}
-
-      cmp.setup {
-        snippet = {
-          expand = function(args)
-            luasnip.lsp_expand(args.body)
-          end,
-        },
-        completion = { completeopt = 'menu,menuone,noinsert' },
-
-        -- for an understanding of why these mappings were
-        -- chosen, you will need to read `:help ins-completion`
-        --
-        -- no, but seriously. please read `:help ins-completion`, it is really good!
-        mapping = cmp.mapping.preset.insert {
-          -- select the [n]ext item
-          ['<c-n>'] = cmp.mapping.select_next_item(),
-          -- select the [p]revious item
-          ['<c-p>'] = cmp.mapping.select_prev_item(),
-
-          -- scroll the documentation window [b]ack / [f]orward
-          ['<c-b>'] = cmp.mapping.scroll_docs(-4),
-          ['<c-f>'] = cmp.mapping.scroll_docs(4),
-
-          -- accept ([y]es) the completion.
-          --  this will auto-import if your lsp supports it.
-          --  this will expand snippets if the lsp sent a snippet.
-          ['<c-y>'] = cmp.mapping.confirm { select = true },
-
-          -- if you prefer more traditional completion keymaps,
-          -- you can uncomment the following lines
-          --['<cr>'] = cmp.mapping.confirm { select = true },
-          --['<tab>'] = cmp.mapping.select_next_item(),
-          --['<s-tab>'] = cmp.mapping.select_prev_item(),
-
-          -- manually trigger a completion from nvim-cmp.
-          --  generally you don't need this, because nvim-cmp will display
-          --  completions whenever it has completion options available.
-          ['<c-space>'] = cmp.mapping.complete {},
-
-          -- think of <c-l> as moving to the right of your snippet expansion.
-          --  so if you have a snippet that's like:
-          --  function $name($args)
-          --    $body
-          --  end
-          --
-          -- <c-l> will move you to the right of each of the expansion locations.
-          -- <c-h> is similar, except moving you backwards.
-          ['<c-l>'] = cmp.mapping(function()
-            if luasnip.expand_or_locally_jumpable() then
-              luasnip.expand_or_jump()
-            end
-          end, { 'i', 's' }),
-          ['<c-h>'] = cmp.mapping(function()
-            if luasnip.locally_jumpable(-1) then
-              luasnip.jump(-1)
-            end
-          end, { 'i', 's' }),
-
-          -- for more advanced luasnip keymaps (e.g. selecting choice nodes, expansion) see:
-          --    https://github.com/l3mon4d3/luasnip?tab=readme-ov-file#keymaps
-        },
-        sources = {
-          { name = 'nvim_lsp' },
-          { name = 'luasnip' },
-          { name = 'path' },
-        },
-      }
-    end,
-  },
   {
-    'pmizio/typescript-tools.nvim',
-    dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
-    opts = {},
-    config = function()
-      require('typescript-tools').setup {
-        settings = {
-          jsx_close_tag = {
-            enable = true,
-            filetypes = { 'javascriptreact', 'typescriptreact' },
-          },
-        },
-      }
-    end,
+    'saghen/blink.cmp',
+    dependencies = 'rafamadriz/friendly-snippets',
+    version = '*',
+    ---@module 'blink.cmp'
+    ---@type blink.cmp.Config
+    opts = {
+      keymap = {
+        preset = 'default',
+      },
+      appearance = {
+        use_nvim_cmp_as_default = true,
+        nerd_font_variant = 'normal',
+      },
+      sources = {
+        default = { 'lsp', 'path', 'snippets', 'buffer' },
+      },
+    },
+    opts_extend = { 'sources.default' },
   },
-
   { -- you can easily change to a different colorscheme.
     -- change the name of the colorscheme plugin below, and then
     -- change the command in the config to whatever the name of that colorscheme is.
