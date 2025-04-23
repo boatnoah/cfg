@@ -3,6 +3,11 @@
 #
 export ZSH="$HOME/.oh-my-zsh"
 
+# 
+# Disable updates
+#
+zstyle ':omz:update' mode disabled
+
 # Performance optimization
 DISABLE_UNTRACKED_FILES_DIRTY="true"
 
@@ -71,3 +76,5 @@ alias nvim-dev='NVIM_APPNAME="nvim-dev" nvim'
 # Theme Configuration (load last for better startup time)
 #
 eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/zen.toml)"
+
+[ -f "/home/boat/.ghcup/env" ] && . "/home/boat/.ghcup/env" # ghcup-env

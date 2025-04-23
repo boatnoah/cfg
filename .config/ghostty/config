@@ -7,4 +7,5 @@ mouse-hide-while-typing = true
 cursor-style-blink = false
 bold-is-bright = true
 confirm-close-surface = false
+font-feature = -calt, -liga, -dlig
 

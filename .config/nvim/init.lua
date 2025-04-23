@@ -157,60 +157,6 @@ require('lazy').setup({
     },
   },
 
-  -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
-  --
-  -- This is often very useful to both group configuration, as well as handle
-  -- lazy loading plugins that don't need to be loaded immediately at startup.
-  --
-  -- For example, in the following configuration, we use:
-  --  event = 'VimEnter'
-  --
-  -- which loads which-key before all the UI elements are loaded. Events can be
-  -- normal autocommands events (`:help autocmd-events`).
-  --
-  -- Then, because we use the `config` key, the configuration only runs
-  -- after the plugin has been loaded:
-  --  config = function() ... end
-
-  { -- Useful plugin to show you pending keybinds.
-    'folke/which-key.nvim',
-    event = 'VimEnter', -- Sets the loading event to 'VimEnter'
-    config = function() -- This is the function that runs, AFTER loading
-      local wk = require 'which-key'
-      wk.setup()
-
-      -- Document existing key chains
-      wk.add {
-        { '<leader>c', group = '[C]ode' },
-        { '<leader>c_', hidden = true },
-        { '<leader>d', group = '[D]ocument' },
-        { '<leader>d_', hidden = true },
-        { '<leader>r', group = '[R]ename' },
-        { '<leader>r_', hidden = true },
-        { '<leader>f', group = '[F]ind' },
-        { '<leader>f_', hidden = true },
-        { '<leader>w', group = '[W]orkspace' },
-        { '<leader>w_', hidden = true },
-        { '<leader>t', group = '[T]oggle' },
-        { '<leader>t_', hidden = true },
-        { '<leader>h', group = 'Git [H]unk' },
-        { '<leader>h_', hidden = true },
-      }
-
-      -- visual mode
-      wk.add {
-        { '<leader>h', desc = 'Git [H]unk', mode = 'v' },
-      }
-    end,
-  },
-
-  -- NOTE: Plugins can specify dependencies.
-  --
-  -- The dependencies are proper plugin specifications as well - anything
-  -- you do for a plugin at the top level, you can do for a dependency.
-  --
-  -- Use the `dependencies` key to specify the dependencies of a particular plugin
-
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
@@ -326,12 +272,11 @@ require('lazy').setup({
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', opts = {} },
 
       -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
       -- used for completion, annotations and signatures of Neovim apis
       { 'folke/neodev.nvim', opts = {} },
-      { 'saghen/blink.cmp' },
+      -- { 'saghen/blink.cmp' },
     },
     config = function()
       -- Brief aside: **What is LSP?**
@@ -461,8 +406,8 @@ require('lazy').setup({
       --  By default, Neovim doesn't support everything that is in the LSP specification.
       --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
       --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = vim.tbl_deep_extend('force', capabilities, require('blink.cmp').get_lsp_capabilities())
+      -- local capabilities = vim.lsp.protocol.make_client_capabilities()
+      -- capabilities = vim.tbl_deep_extend('force', capabilities, require('blink.cmp').get_lsp_capabilities())
 
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -526,7 +471,7 @@ require('lazy').setup({
         handlers = {
           function(server_name)
             local server = servers[server_name] or {}
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+            server.capabilities = vim.tbl_deep_extend('force', {}, server.capabilities or {})
             require('lspconfig')[server_name].setup(server)
           end,
         },
@@ -572,41 +517,39 @@ require('lazy').setup({
         javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
         markdown = { 'prettierd', 'prettier', stop_after_first = true },
         css = { 'prettierd', 'prettier', stop_after_first = true },
+        haskell = { 'ormolu' },
         html = { 'prettierd', 'prettier', stop_after_first = true },
         cpp = { 'clang-format' },
+        c = { 'clang-format' },
         go = { 'gofumpt' },
       },
     },
   },
 
+  -- {
+  --   'saghen/blink.cmp',
+  --   dependencies = 'rafamadriz/friendly-snippets',
+  --   version = '*',
+  --   ---@module 'blink.cmp'
+  --   ---@type blink.cmp.Config
+  --   opts = {
+  --     keymap = {
+  --       preset = 'default',
+  --     },
+  --     appearance = {
+  --       use_nvim_cmp_as_default = true,
+  --       nerd_font_variant = 'normal',
+  --     },
+  --     sources = {
+  --       default = { 'lsp', 'path', 'snippets', 'buffer' },
+  --     },
+  --   },
+  --   opts_extend = { 'sources.default' },
+  -- },
   {
-    'saghen/blink.cmp',
-    dependencies = 'rafamadriz/friendly-snippets',
-    version = '*',
-    ---@module 'blink.cmp'
-    ---@type blink.cmp.Config
-    opts = {
-      keymap = {
-        preset = 'default',
-      },
-      appearance = {
-        use_nvim_cmp_as_default = true,
-        nerd_font_variant = 'normal',
-      },
-      sources = {
-        default = { 'lsp', 'path', 'snippets', 'buffer' },
-      },
-    },
-    opts_extend = { 'sources.default' },
-  },
-  { -- you can easily change to a different colorscheme.
-    -- change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    --
-    -- if you want to see what colorschemes are already installed, you can use `:telescope colorscheme`.
     'catppuccin/nvim',
     name = 'catppuccin',
-    priority = 1000, -- make sure to load this before all the other start plugins.
+    priority = 1000,
     opts = {
       integrations = {
         cmp = true,
@@ -622,9 +565,6 @@ require('lazy').setup({
       },
     },
     init = function()
-      -- load the colorscheme here.
-      -- like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       vim.cmd.colorscheme 'catppuccin-mocha'
 
       -- you can configure highlights by doing something like:
@@ -714,12 +654,8 @@ require('lazy').setup({
   --  here are some example plugins that i've included in the kickstart repository.
   --  uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  -- require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
-  -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
-  --  require 'kickstart.plugins.neo-tree',
-  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+
+  require 'kickstart.plugins.gitsigns',
 
   -- note: the import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    this is the easiest way to modularize your config.
