@@ -35,6 +35,7 @@ bindsym $mod+Shift+3 exec "i3-nagbar -t warning -m 'You pressed the exit shortcu
 
 # Applications
 bindsym $mod+Return exec ghostty
+bindsym $mod+b exec firefox 
 bindsym $mod+Tab exec --no-startup-id ~/.config/rofi/launchers/type-2/launcher.sh
 bindsym $mod+Shift+BackSpace exec --no-startup-id ~/.config/rofi/applets/bin/screenshot.sh
 bindsym $mod+Shift+d kill

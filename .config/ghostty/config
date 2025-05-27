@@ -8,4 +8,7 @@ cursor-style-blink = false
 bold-is-bright = true
 confirm-close-surface = false
 font-feature = -calt, -liga, -dlig
-
+keybind = ctrl+space=increase_font_size:1
+keybind = ctrl+backspace=decrease_font_size:1
+keybind = ctrl+;=reset_font_size
+cursor-opacity = 0.6

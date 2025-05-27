@@ -33,6 +33,8 @@ setopt hist_find_no_dups
 export EDITOR=nvim
 NPM_GLOBALS="${HOME}/.npm-globals"
 export PATH="$PATH:$NPM_GLOBALS/bin:$PATH"
+GOPATH=$HOME/go PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
+
 
 #
 # Completion Settings
@@ -66,6 +68,7 @@ source $ZSH/oh-my-zsh.sh
 #
 
 # Navigation and utilities
+alias vim='nvim'
 alias nvconf='nvim ~/.config/nvim/init.lua'
 alias zshrc='nvim ~/.zshrc'
 alias c='clear'
